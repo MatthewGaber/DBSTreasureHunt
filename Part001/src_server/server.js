@@ -5,6 +5,7 @@ var http = require("http");
 var socketIO = require("socket.io");
 var path = require("path");
 var Player_1 = require("./Player");
+//https://salty-depths-71580.herokuapp.com
 var GameServer = /** @class */ (function () {
     function GameServer() {
         var _this = this;

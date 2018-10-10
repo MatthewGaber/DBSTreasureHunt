@@ -13,11 +13,11 @@ export class Game extends Phaser.Game
             Phaser.CANVAS,
             "gameDiv"
         );
-        let btn = document.getElementById("coolbutton");
-        btn.addEventListener("click", (e:Event) => this.getTrainingName());
+        let btn = document.getElementById("startlevelbutton");
+        btn.addEventListener("click", (e:Event) => this.startlevel());
         
     }
-    public getTrainingName(){
+    public startlevel(){
         this.state.add("Level", Level, false);
         this.state.start("Level");
     }

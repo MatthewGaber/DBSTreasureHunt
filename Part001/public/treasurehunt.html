@@ -2,7 +2,8 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="initial-scale=1 maximum-scale=1 user-scalable=0 minimal-ui" />
+        <!-- <meta name="viewport" content="initial-scale=1 maximum-scale=1 user-scalable=0" />-->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
          
         <title>Treasure Hunt</title>
         <link rel = "stylesheet" href = "app.css" type = "text/css" />
@@ -14,10 +15,20 @@
     </head>
     <body>
             <h1>Treasure Hunt</h1>
-            <p>Please enter your name below and the click start.</p>
+            <p>Please enter your name, select an Avatar and click start.</p>
+            <div id="inputs"></div>
+            <label>Name</label>
             <input id="myName" type="text"></input>
-            <input type="button" value="Start" id="coolbutton"></input>
+            
+            <input type="radio" name="inputs" id="nsprite" />
+            <label for="nsprite"><img src="./images/ninjaleft.png" alt="ninjasprite" /></label>
+            <input type="radio" name="inputs" id="nrsprite" />
+            <label for="nrsprite" id ="girlsprite"><img src="./images/girlright.png" alt="ninjarsprite" /></label>
+            <input type="button" value="Start" id="startlevelbutton"></input>
+        </div>
+
             <p></p>
-             <div id="gameDiv"></div>
+            <!--style="overflow-x:auto; overflow-y:auto "-->
+             <div id="gameDiv">  </div>
     </body>
 </html>

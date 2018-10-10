@@ -17,11 +17,11 @@ var Game = /** @class */ (function (_super) {
     __extends(Game, _super);
     function Game() {
         var _this = _super.call(this, window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, "gameDiv") || this;
-        var btn = document.getElementById("coolbutton");
-        btn.addEventListener("click", function (e) { return _this.getTrainingName(); });
+        var btn = document.getElementById("startlevelbutton");
+        btn.addEventListener("click", function (e) { return _this.startlevel(); });
         return _this;
     }
-    Game.prototype.getTrainingName = function () {
+    Game.prototype.startlevel = function () {
         this.state.add("Level", Level_1.Level, false);
         this.state.start("Level");
     };
@@ -79,14 +79,18 @@ var Level = /** @class */ (function (_super) {
         this.physics.p2.enableBody(this.physics.p2.walls, false);
         this.load.image("background", "./images/background1.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
+        this.load.image("girlright", "./images/girlright.png");
         this.load.image("treasure", "./images/treasure.png");
+        // change for git
+        // change for git
         // physics start system
         //game.physics.p2.setImpactEvents(true);
     };
     Level.prototype.create = function () {
         var _this = this;
         this._socket = io.connect();
-        this.add.tileSprite(0, 0, 1500, this.game.cache.getImage('background').height, 'background');
+        this.add.image(0, 0, "background");
+        //this.add.tileSprite(0, 0, 1500, this.game.cache.getImage('background').height, 'background');
         console.log("client started");
         this._socket.on("connect", function () { _this.OnSocketConnected(); });
         // Listen to new enemy connections
@@ -119,18 +123,32 @@ var Level = /** @class */ (function (_super) {
                 }, this);
                 if (this._player.x > 520 && this._player.x < 530 && this._player.y > 420 && this._player.y < 430) {
                     this.add.tileSprite(525 - (this.game.cache.getImage('treasure').width / 2), 425 - (this.game.cache.getImage('treasure').height / 2), this.game.cache.getImage('treasure').width, this.game.cache.getImage('treasure').height, 'treasure');
+                    this.time.events.add(Phaser.Timer.SECOND * 4, this.fadePicture, this);
                 }
             }
             //console.log(this._player.x, this._player.y);
             this._socket.emit('move_player', { x: this._player.x, y: this._player.y, angle: this._player.angle });
         }
     };
+    Level.prototype.fadePicture = function () {
+        this.add.tween('treasure').to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+    };
     Level.prototype.CreatePlayer = function () {
-        this._player = this.add.sprite(0, 0, 'ninjaleft');
+        if (document.getElementById("nsprite").checked) {
+            this._player = this.add.sprite(0, 0, 'ninjaleft');
+        }
+        if (document.getElementById("nrsprite").checked) {
+            this._player = this.add.sprite(0, 0, 'girlright');
+        }
         this.physics.p2.enableBody(this._player, true);
         this._player.body.clearShapes();
         var unit = document.getElementById("myName").value;
-        var name = this.game.add.text(this._player.x, this._player.y - 40, unit, { font: '18px Arial', fill: '#FF0000', align: 'center' });
+        if (document.getElementById("nsprite").checked) {
+            var name = this.game.add.text(this._player.x, this._player.y - 40, unit, { font: '15px Arial', fill: '#0024ff', align: 'center' });
+        }
+        if (document.getElementById("nrsprite").checked) {
+            var name = this.game.add.text(this._player.x, this._player.y - 40, unit, { font: '15px Arial', fill: '#ff00de', align: 'center' });
+        }
         name.anchor.set(0.5);
         this._player.addChild(name); //this._player.body.data.shapes[0].sensor = true;
     };
@@ -237,18 +255,21 @@ var RemotePlayer = /** @class */ (function () {
         this.y = startY;
         this.angle = startAngle;
         this.username = username;
-        //this.load.image("ninjaleft", "./images/ninjaleft.png");
-        //this.load.image("ninjaleft", "./images/ninjaleft.png");
-        //this.player = state.add.sprite(this.x, this.y);
-        console.log("1 Remote Player x and y" + this.x, this.y);
-        this.player = state.add.sprite(this.x, this.y, 'ninjaleft');
+        if (document.getElementById("nsprite").checked) {
+            this.player = state.add.sprite(this.x, this.y, 'ninjaleft');
+        }
+        if (document.getElementById("nrsprite").checked) {
+            this.player = state.add.sprite(0, 0, 'girlright');
+        }
         state.physics.arcade.enableBody(this.player);
-        console.log("2 Remote Player x and y" + this.x, this.y);
-        var name = state.add.text(20, -5, this.username, { font: '18px Arial', fill: '#FF0000', align: 'center' });
+        if (document.getElementById("nsprite").checked) {
+            var name = state.add.text(20, -5, this.username, { font: '15px Arial', fill: '#0024ff', align: 'center' });
+        }
+        if (document.getElementById("nrsprite").checked) {
+            var name = state.add.text(20, -5, this.username, { font: '15px Arial', fill: '#ff00de', align: 'center' });
+        }
         name.anchor.set(0.5);
         this.player.addChild(name);
-        //this.player.body.clearShapes();
-        //this.player.body.data.shapes[0].sensor = true;
     }
     return RemotePlayer;
 }());

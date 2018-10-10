@@ -31,6 +31,7 @@ export class Level extends Phaser.State
         this.physics.p2.enableBody(this.physics.p2.walls, false);
         this.load.image("background", "./images/background1.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
+        this.load.image("girlright", "./images/girlright.png");
         this.load.image("treasure", "./images/treasure.png" )
        
         
@@ -45,7 +46,8 @@ export class Level extends Phaser.State
     public create()
     {
         this._socket = io.connect();
-        this.add.tileSprite(0, 0, 1500, this.game.cache.getImage('background').height, 'background');
+        this.add.image(0,0,"background")
+        //this.add.tileSprite(0, 0, 1500, this.game.cache.getImage('background').height, 'background');
         console.log("client started");
        
         this._socket.on("connect", () => { this.OnSocketConnected(); });
@@ -95,8 +97,8 @@ export class Level extends Phaser.State
    
         if (this._player.x >520 && this._player.x <530  && this._player.y >420 && this._player.y <430){
             this.add.tileSprite(525 - (this.game.cache.getImage('treasure').width/2), 425 - (this.game.cache.getImage('treasure').height/2), this.game.cache.getImage('treasure').width, this.game.cache.getImage('treasure').height, 'treasure');
-
-        }
+            this.time.events.add(Phaser.Timer.SECOND * 4, this.fadePicture, this);
+        } 
         
         }
         //console.log(this._player.x, this._player.y);
@@ -105,18 +107,30 @@ export class Level extends Phaser.State
     }
         
     }
+    private fadePicture() {
 
+        this.add.tween('treasure').to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+    
+    }
     private CreatePlayer()
     {
-          
-        this._player = this.add.sprite(0, 0, 'ninjaleft');
-        this.physics.p2.enableBody(this._player, true);
-  
-        this._player.body.clearShapes();
-        var unit = (<HTMLInputElement>document.getElementById("myName")).value; 
+        if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+            this._player = this.add.sprite(0, 0, 'ninjaleft');
+        }
+        if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+            this._player = this.add.sprite(0, 0, 'girlright');
+        }
         
-        var name = this.game.add.text(this._player.x, this._player.y-40, unit, {font:'18px Arial', fill: '#FF0000', align: 'center'});
-
+        this.physics.p2.enableBody(this._player, true);
+        this._player.body.clearShapes();
+        var unit = (<HTMLInputElement>document.getElementById("myName")).value;    
+        if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+            var name = this.game.add.text(this._player.x, this._player.y-40, unit, {font:'15px Arial', fill: '#0024ff', align: 'center'});
+        }
+        if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+            var name = this.game.add.text(this._player.x, this._player.y-40, unit, {font:'15px Arial', fill: '#ff00de', align: 'center'});
+        }
+        
         name.anchor.set(0.5)
         this._player.addChild(name);//this._player.body.data.shapes[0].sensor = true;
         

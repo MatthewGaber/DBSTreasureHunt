@@ -3,8 +3,47 @@ h1 {
         SunSans-Regular, sans-serif }
         
 body {
-  padding-left: 11em;
+  padding-left: 1em;
   font-family: Georgia, "Times New Roman",
         Times, serif;
   color: blue;
   background-color: #ffde00 }
+  .input_hidden {
+      position: absolute;
+      left: -9999px;
+  }
+  
+  .selected {
+      background-color: #ccc;
+  }
+  
+  #inputs label {
+      display: inline-block;
+      cursor: pointer;
+  }
+  
+  #inputs label img {
+      padding: 3px;
+  }
+
+  #myName { 
+      margin-right: 30px;
+  }
+  #girlsprite { 
+      margin-right: 30px;
+  }
+ 
+  #gameDiv { 
+      height: 100%;
+      width: 100%;
+  }
+
+  input[type=button]{
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 8px 32px;
+      text-decoration: none;
+      margin: 2px 2px;
+      cursor: pointer;
+  }

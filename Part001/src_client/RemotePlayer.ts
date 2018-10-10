@@ -26,22 +26,25 @@ export class RemotePlayer
         this.y = startY;
         this.angle = startAngle;
         this.username = username;
-        //this.load.image("ninjaleft", "./images/ninjaleft.png");
-
-        //this.load.image("ninjaleft", "./images/ninjaleft.png");
-        //this.player = state.add.sprite(this.x, this.y);
-        console.log("1 Remote Player x and y" + this.x, this.y);
-        this.player = state.add.sprite(this.x, this.y, 'ninjaleft');
+        
+        if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+            this.player = state.add.sprite(this.x, this.y, 'ninjaleft');
+        }
+        if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+            this.player = state.add.sprite(0, 0, 'girlright');
+        }
         state.physics.arcade.enableBody(this.player);
-        console.log("2 Remote Player x and y" + this.x, this.y);
-        var name = state.add.text(20, -5, this.username, {font:'18px Arial', fill: '#FF0000', align: 'center'});
-
+        
+        if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+            var name = state.add.text(20, -5, this.username, {font:'15px Arial', fill: '#0024ff', align: 'center'});
+        }
+        if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+            var name = state.add.text(20, -5, this.username, {font:'15px Arial', fill: '#ff00de', align: 'center'});
+        }
+        
         name.anchor.set(0.5)
         this.player.addChild(name);
         
-       
-        //this.player.body.clearShapes();
-        //this.player.body.data.shapes[0].sensor = true;
         
     }
 }
