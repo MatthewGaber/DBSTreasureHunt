@@ -7,6 +7,8 @@ import { GameProperties } from "./GameProperties";
 
 import { PlayerHelper } from "./PlayerHelper";
 import { RemotePlayer } from "./RemotePlayer";
+import { textSpanIntersectsWithPosition } from "typescript";
+import { Sprite } from "phaser-ce";
 
 
 export class Level extends Phaser.State
@@ -14,6 +16,8 @@ export class Level extends Phaser.State
     private _socket: SocketIOClient.Socket;
     private _player: Phaser.Sprite;
     private _enemyList: RemotePlayer[] = [];
+    private treasure: Phaser.Sprite;
+    //private playerCollisionGroup: Phaser.Physics.P2.CollisionGroup;
    
    
   
@@ -24,37 +28,35 @@ export class Level extends Phaser.State
         this.world.setBounds(
             0, 0,
             GameProperties.GameWidth, GameProperties.GameHeight);
-        this.physics.startSystem(Phaser.Physics.P2JS);
-        this.physics.p2.setBoundsToWorld(false, false, false, false);
-        this.physics.p2.gravity.y = 0;
-        this.physics.p2.applyGravity = false;
-        this.physics.p2.enableBody(this.physics.p2.walls, false);
         this.load.image("background", "./images/background1.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
         this.load.image("girlright", "./images/girlright.png");
         this.load.image("treasure", "./images/treasure.png" )
        
-        
-        
-        
-        // change for git
-        // change for git
-        // physics start system
-        //game.physics.p2.setImpactEvents(true);
+    
     }
     
     public create()
     {
         this._socket = io.connect();
         this.add.image(0,0,"background")
-        //this.add.tileSprite(0, 0, 1500, this.game.cache.getImage('background').height, 'background');
+        this.treasure = this.add.sprite(525, 425, 'treasure');
+        this.treasure.visible = false;
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+        this.physics.enable(this.treasure, Phaser.Physics.ARCADE);
+        //this.treasure.setBounds(520, 420, 530, 430);
+        this.treasure.body.collideWorldBounds = true;
+        this.treasure.x = 525;
+        this.treasure.y = 425;
+        this.treasure.body.velocity=0;
+
         console.log("client started");
        
         this._socket.on("connect", () => { this.OnSocketConnected(); });
         
         // Listen to new enemy connections
         this._socket.on("new_enemyPlayer",
-            (data: { id: string, x: number, y: number, username: string, angle: number }) =>
+            (data: { id: string, x: number, y: number, username: string, angle: number, mysprite: string }) =>
             {
                 this.OnNewPlayer(data);
             });
@@ -76,6 +78,13 @@ export class Level extends Phaser.State
     
     public update()
     {
+        for (var i = 0; i < this._enemyList.length; i++) {
+            if (this._enemyList[i]) {
+              //this._enemyList[i].update()
+              this.physics.arcade.collide(this._player, this._enemyList[i].player, this.collisionHandler)
+              
+            }
+          }
         if (GameProperties.InGame){
             
         //this.input.update();
@@ -95,22 +104,55 @@ export class Level extends Phaser.State
                 this._player.body.velocity.y = 0;
                 }, this);
    
-        if (this._player.x >520 && this._player.x <530  && this._player.y >420 && this._player.y <430){
-            this.add.tileSprite(525 - (this.game.cache.getImage('treasure').width/2), 425 - (this.game.cache.getImage('treasure').height/2), this.game.cache.getImage('treasure').width, this.game.cache.getImage('treasure').height, 'treasure');
-            this.time.events.add(Phaser.Timer.SECOND * 4, this.fadePicture, this);
-        } 
+        //if (this._player.x >520 && this._player.x <530  && this._player.y >420 && this._player.y <430){
+            //this.add.tileSprite(525 - (this.game.cache.getImage('treasure').width/2), 425 - (this.game.cache.getImage('treasure').height/2), this.game.cache.getImage('treasure').width, this.game.cache.getImage('treasure').height, 'treasure');
+           // this.time.events.add(Phaser.Timer.SECOND * 4, this.showTreasure, this);
+           // console.log("fade picture called");
+        //} 
         
         }
-        //console.log(this._player.x, this._player.y);
-        this._socket.emit('move_player', { x: this._player.x, y: this._player.y, angle: this._player.angle });
-
-    }
+        // Now check for a collision between objects
+        this.physics.arcade.overlap(this._player, this.treasure, this.showTreasure, null, this);
         
-    }
-    private fadePicture() {
 
-        this.add.tween('treasure').to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+        this._socket.emit('move_player', { x: this._player.body.x, y: this._player.body.y, angle: this._player.angle });
+
+        }   
+    }
+
+
+    private collisionHandler(){
+        
+            //this._player.body.velocity.x = 10;
+            //this._player.body.velocity.y = 10;
+      
+
+    }
+
+
+    private showTreasure(obj1: Sprite, obj2: Sprite) {
+        var obj1hasOverlapped: Boolean;
+        var obj2hasOverlapped: Boolean;
+
+        if(!obj1hasOverlapped && !obj2hasOverlapped){
+            obj1hasOverlapped = obj2hasOverlapped = true;
+            this.treasure.visible = true;
+            console.log("collided");
+            //this.treasure.visible = true;
+        
+            this.time.events.add(Phaser.Timer.SECOND * 4, this.hideTreasure, this);
+        }
+
+        console.log("collided");
+        //this.treasure.visible = true;
+        
+        this.time.events.add(Phaser.Timer.SECOND * 4, this.hideTreasure, this);
+        //this.add.tween(this.treasure).to( { alpha: 1 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
     
+    }
+
+    private hideTreasure(){
+        this.treasure.visible=false;
     }
     private CreatePlayer()
     {
@@ -121,18 +163,27 @@ export class Level extends Phaser.State
             this._player = this.add.sprite(0, 0, 'girlright');
         }
         
-        this.physics.p2.enableBody(this._player, true);
-        this._player.body.clearShapes();
+       
+        this.physics.enable(this._player, Phaser.Physics.ARCADE);
+        this.physics.arcade.enableBody(this._player);
+        this._player.body.collideWorldBounds = true;
+
+
+        
+
+
+
         var unit = (<HTMLInputElement>document.getElementById("myName")).value;    
         if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
-            var name = this.game.add.text(this._player.x, this._player.y-40, unit, {font:'15px Arial', fill: '#0024ff', align: 'center'});
+            var name = this.game.add.text(this._player.x, this._player.y, unit, {font:'15px Arial', fill: '#0024ff', align: 'center'});
         }
         if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
-            var name = this.game.add.text(this._player.x, this._player.y-40, unit, {font:'15px Arial', fill: '#ff00de', align: 'center'});
+            var name = this.game.add.text(this._player.x, this._player.y, unit, {font:'15px Arial', fill: '#ff00de', align: 'center'});
         }
         
         name.anchor.set(0.5)
-        this._player.addChild(name);//this._player.body.data.shapes[0].sensor = true;
+        this._player.addChild(name);
+       
         
     }
 
@@ -142,14 +193,25 @@ export class Level extends Phaser.State
         this.CreatePlayer();
         GameProperties.InGame = true;
         var unit = (<HTMLInputElement>document.getElementById("myName")).value; 
+        if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+            var thesprite = 'ninjaleft';
+        }
+        if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+            var thesprite = 'girlright';
+        }
         // Send the server our initial position and tell it we are connectedthis._socket.
-        this._socket.emit("new_player", { x: 0, y: 0, angle: 0, username: unit });
+        this._socket.emit("new_player", { x: 0, y: 0, angle: 0, username: unit, mysprite: thesprite });
     }
 
-    private OnNewPlayer(data: { id: string, x: number, y: number, username: string, angle: number })
+    private OnNewPlayer(data: { id: string, x: number, y: number, username: string, angle: number, mysprite: string })
     {
-        // Enemy object
-        let newEnemy = new RemotePlayer(data.id, data.x, data.y, data.username, data.angle, this);
+        //if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+        //   var mysprite: string = "ninjaleft";
+        //}
+        //if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+        //    var mysprite: string = "girlright";
+       //}
+        let newEnemy = new RemotePlayer(data.id, data.x, data.y, data.username, data.angle, data.mysprite, this);
         console.log("1newEnemy" + data.x, data.y);
         
         this._enemyList.push(newEnemy);

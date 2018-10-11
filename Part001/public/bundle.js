@@ -68,29 +68,29 @@ var Level = /** @class */ (function (_super) {
         _this._enemyList = [];
         return _this;
     }
+    //private playerCollisionGroup: Phaser.Physics.P2.CollisionGroup;
     Level.prototype.preload = function () {
         this.stage.disableVisibilityChange = true;
         this.scale.scaleMode = Phaser.ScaleManager.RESIZE;
         this.world.setBounds(0, 0, GameProperties_1.GameProperties.GameWidth, GameProperties_1.GameProperties.GameHeight);
-        this.physics.startSystem(Phaser.Physics.P2JS);
-        this.physics.p2.setBoundsToWorld(false, false, false, false);
-        this.physics.p2.gravity.y = 0;
-        this.physics.p2.applyGravity = false;
-        this.physics.p2.enableBody(this.physics.p2.walls, false);
         this.load.image("background", "./images/background1.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
         this.load.image("girlright", "./images/girlright.png");
         this.load.image("treasure", "./images/treasure.png");
-        // change for git
-        // change for git
-        // physics start system
-        //game.physics.p2.setImpactEvents(true);
     };
     Level.prototype.create = function () {
         var _this = this;
         this._socket = io.connect();
         this.add.image(0, 0, "background");
-        //this.add.tileSprite(0, 0, 1500, this.game.cache.getImage('background').height, 'background');
+        this.treasure = this.add.sprite(525, 425, 'treasure');
+        this.treasure.visible = false;
+        this.physics.startSystem(Phaser.Physics.ARCADE);
+        this.physics.enable(this.treasure, Phaser.Physics.ARCADE);
+        //this.treasure.setBounds(520, 420, 530, 430);
+        this.treasure.body.collideWorldBounds = true;
+        this.treasure.x = 525;
+        this.treasure.y = 425;
+        this.treasure.body.velocity = 0;
         console.log("client started");
         this._socket.on("connect", function () { _this.OnSocketConnected(); });
         // Listen to new enemy connections
@@ -107,6 +107,12 @@ var Level = /** @class */ (function (_super) {
         });
     };
     Level.prototype.update = function () {
+        for (var i = 0; i < this._enemyList.length; i++) {
+            if (this._enemyList[i]) {
+                //this._enemyList[i].update()
+                this.physics.arcade.collide(this._player, this._enemyList[i].player, this.collisionHandler);
+            }
+        }
         if (GameProperties_1.GameProperties.InGame) {
             //this.input.update();
             var pointer = this.input.activePointer;
@@ -121,17 +127,38 @@ var Level = /** @class */ (function (_super) {
                     this._player.body.velocity.x = 0;
                     this._player.body.velocity.y = 0;
                 }, this);
-                if (this._player.x > 520 && this._player.x < 530 && this._player.y > 420 && this._player.y < 430) {
-                    this.add.tileSprite(525 - (this.game.cache.getImage('treasure').width / 2), 425 - (this.game.cache.getImage('treasure').height / 2), this.game.cache.getImage('treasure').width, this.game.cache.getImage('treasure').height, 'treasure');
-                    this.time.events.add(Phaser.Timer.SECOND * 4, this.fadePicture, this);
-                }
+                //if (this._player.x >520 && this._player.x <530  && this._player.y >420 && this._player.y <430){
+                //this.add.tileSprite(525 - (this.game.cache.getImage('treasure').width/2), 425 - (this.game.cache.getImage('treasure').height/2), this.game.cache.getImage('treasure').width, this.game.cache.getImage('treasure').height, 'treasure');
+                // this.time.events.add(Phaser.Timer.SECOND * 4, this.showTreasure, this);
+                // console.log("fade picture called");
+                //} 
             }
-            //console.log(this._player.x, this._player.y);
-            this._socket.emit('move_player', { x: this._player.x, y: this._player.y, angle: this._player.angle });
+            // Now check for a collision between objects
+            this.physics.arcade.overlap(this._player, this.treasure, this.showTreasure, null, this);
+            this._socket.emit('move_player', { x: this._player.body.x, y: this._player.body.y, angle: this._player.angle });
         }
     };
-    Level.prototype.fadePicture = function () {
-        this.add.tween('treasure').to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+    Level.prototype.collisionHandler = function () {
+        this._player.body.velocity.x = 10;
+        this._player.body.velocity.y = 10;
+    };
+    Level.prototype.showTreasure = function (obj1, obj2) {
+        var obj1hasOverlapped;
+        var obj2hasOverlapped;
+        if (!obj1hasOverlapped && !obj2hasOverlapped) {
+            obj1hasOverlapped = obj2hasOverlapped = true;
+            this.treasure.visible = true;
+            console.log("collided");
+            //this.treasure.visible = true;
+            this.time.events.add(Phaser.Timer.SECOND * 4, this.hideTreasure, this);
+        }
+        console.log("collided");
+        //this.treasure.visible = true;
+        this.time.events.add(Phaser.Timer.SECOND * 4, this.hideTreasure, this);
+        //this.add.tween(this.treasure).to( { alpha: 1 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+    };
+    Level.prototype.hideTreasure = function () {
+        this.treasure.visible = false;
     };
     Level.prototype.CreatePlayer = function () {
         if (document.getElementById("nsprite").checked) {
@@ -140,29 +167,41 @@ var Level = /** @class */ (function (_super) {
         if (document.getElementById("nrsprite").checked) {
             this._player = this.add.sprite(0, 0, 'girlright');
         }
-        this.physics.p2.enableBody(this._player, true);
-        this._player.body.clearShapes();
+        this.physics.enable(this._player, Phaser.Physics.ARCADE);
+        this.physics.arcade.enableBody(this._player);
+        this._player.body.collideWorldBounds = true;
         var unit = document.getElementById("myName").value;
         if (document.getElementById("nsprite").checked) {
-            var name = this.game.add.text(this._player.x, this._player.y - 40, unit, { font: '15px Arial', fill: '#0024ff', align: 'center' });
+            var name = this.game.add.text(this._player.x, this._player.y, unit, { font: '15px Arial', fill: '#0024ff', align: 'center' });
         }
         if (document.getElementById("nrsprite").checked) {
-            var name = this.game.add.text(this._player.x, this._player.y - 40, unit, { font: '15px Arial', fill: '#ff00de', align: 'center' });
+            var name = this.game.add.text(this._player.x, this._player.y, unit, { font: '15px Arial', fill: '#ff00de', align: 'center' });
         }
         name.anchor.set(0.5);
-        this._player.addChild(name); //this._player.body.data.shapes[0].sensor = true;
+        this._player.addChild(name);
     };
     Level.prototype.OnSocketConnected = function () {
         console.log("OnSocketConnected: connected to server");
         this.CreatePlayer();
         GameProperties_1.GameProperties.InGame = true;
         var unit = document.getElementById("myName").value;
+        if (document.getElementById("nsprite").checked) {
+            var thesprite = 'ninjaleft';
+        }
+        if (document.getElementById("nrsprite").checked) {
+            var thesprite = 'girlright';
+        }
         // Send the server our initial position and tell it we are connectedthis._socket.
-        this._socket.emit("new_player", { x: 0, y: 0, angle: 0, username: unit });
+        this._socket.emit("new_player", { x: 0, y: 0, angle: 0, username: unit, mysprite: thesprite });
     };
     Level.prototype.OnNewPlayer = function (data) {
-        // Enemy object
-        var newEnemy = new RemotePlayer_1.RemotePlayer(data.id, data.x, data.y, data.username, data.angle, this);
+        //if ((<HTMLInputElement>document.getElementById("nsprite")).checked){
+        //   var mysprite: string = "ninjaleft";
+        //}
+        //if ((<HTMLInputElement>document.getElementById("nrsprite")).checked){
+        //    var mysprite: string = "girlright";
+        //}
+        var newEnemy = new RemotePlayer_1.RemotePlayer(data.id, data.x, data.y, data.username, data.angle, data.mysprite, this);
         console.log("1newEnemy" + data.x, data.y);
         this._enemyList.push(newEnemy);
     };
@@ -249,23 +288,21 @@ exports.PlayerHelper = PlayerHelper;
 ///<reference path="./libs/phaser.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 var RemotePlayer = /** @class */ (function () {
-    function RemotePlayer(id, startX, startY, username, startAngle, state) {
+    function RemotePlayer(id, startX, startY, username, startAngle, mysprite, state) {
         this.id = id;
         this.x = startX;
         this.y = startY;
         this.angle = startAngle;
         this.username = username;
-        if (document.getElementById("nsprite").checked) {
-            this.player = state.add.sprite(this.x, this.y, 'ninjaleft');
-        }
-        if (document.getElementById("nrsprite").checked) {
-            this.player = state.add.sprite(0, 0, 'girlright');
-        }
+        this.mysprite = mysprite;
+        this.player = state.add.sprite(this.x, this.y, mysprite);
+        state.physics.enable(this.player, Phaser.Physics.ARCADE);
         state.physics.arcade.enableBody(this.player);
-        if (document.getElementById("nsprite").checked) {
+        this.player.body.collideWorldBounds = true;
+        if (mysprite == 'ninjaleft') {
             var name = state.add.text(20, -5, this.username, { font: '15px Arial', fill: '#0024ff', align: 'center' });
         }
-        if (document.getElementById("nrsprite").checked) {
+        else {
             var name = state.add.text(20, -5, this.username, { font: '15px Arial', fill: '#ff00de', align: 'center' });
         }
         name.anchor.set(0.5);

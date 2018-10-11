@@ -69,7 +69,7 @@ class GameServer
 
         // Listen for new player
         // OnNewplayer
-        socket.on("new_player", (data: { x: number, y: number, angle: number, username: string }) =>
+        socket.on("new_player", (data: { x: number, y: number, angle: number, username: string, mysprite: string }) =>
         {
             console.log("new_player: " + data);
             // new player instance
@@ -78,13 +78,15 @@ class GameServer
             console.log(`created new player with username = ${data.username}`);
             newPlayer.id = socket.id;
             newPlayer.username = data.username;
+            newPlayer.mysprite = data.mysprite
             // information to be sent to all clients except sender
             let currentInfo = {
                 id: newPlayer.id,
                 x: newPlayer.x,
                 y: newPlayer.y,
                 username: newPlayer.username,
-                angle: newPlayer.angle
+                angle: newPlayer.angle,
+                mysprite: newPlayer.mysprite
             };
             // send to the new player about everyone who is already connected
             for (let i = 0; i < this._playerList.length; i++)
@@ -96,6 +98,7 @@ class GameServer
                     y: existingPlayer.y,
                     username: existingPlayer.username,
                     angle: existingPlayer.angle,
+                    mysprite: existingPlayer.mysprite
                 };
                 console.log("pushing player");
                 // send message to the sender-client only

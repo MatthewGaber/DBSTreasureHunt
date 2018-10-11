@@ -61,13 +61,15 @@ var GameServer = /** @class */ (function () {
             console.log("created new player with username = " + data.username);
             newPlayer.id = socket.id;
             newPlayer.username = data.username;
+            newPlayer.mysprite = data.mysprite;
             // information to be sent to all clients except sender
             var currentInfo = {
                 id: newPlayer.id,
                 x: newPlayer.x,
                 y: newPlayer.y,
                 username: newPlayer.username,
-                angle: newPlayer.angle
+                angle: newPlayer.angle,
+                mysprite: newPlayer.mysprite
             };
             // send to the new player about everyone who is already connected
             for (var i = 0; i < _this._playerList.length; i++) {
@@ -78,6 +80,7 @@ var GameServer = /** @class */ (function () {
                     y: existingPlayer.y,
                     username: existingPlayer.username,
                     angle: existingPlayer.angle,
+                    mysprite: existingPlayer.mysprite
                 };
                 console.log("pushing player");
                 // send message to the sender-client only
