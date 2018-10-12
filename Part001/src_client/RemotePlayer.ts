@@ -35,6 +35,8 @@ export class RemotePlayer
         state.physics.enable(this.player, Phaser.Physics.ARCADE)
         state.physics.arcade.enableBody(this.player);
         this.player.body.collideWorldBounds = true;
+        var mybody: Phaser.Physics.P2.Body = this.player.body;
+        mybody.setCircle(this.player.width / 2);
         
         if (mysprite == 'ninjaleft'){
         var name = state.add.text(20, -5, this.username, {font:'15px Arial', fill: '#0024ff', align: 'center'});
