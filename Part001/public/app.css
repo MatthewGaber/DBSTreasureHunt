@@ -39,11 +39,12 @@ body {
   }
 
   input[type=button]{
-      background-color: #4CAF50;
+      background-color: rgb(255, 255, 255);
       border: none;
-      color: white;
+      color: rgb(2, 75, 8);
       padding: 8px 32px;
       text-decoration: none;
+      font-weight: bold;
       margin: 2px 2px;
       cursor: pointer;
   }
