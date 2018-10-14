@@ -1,5 +1,5 @@
 /// <reference path="./libs/phaser.d.ts" />
-
+// https://dbs1000.herokuapp.com
 
 import * as io from "socket.io-client";
 
@@ -8,7 +8,7 @@ import { GameProperties } from "./GameProperties";
 import { PlayerHelper } from "./PlayerHelper";
 import { RemotePlayer } from "./RemotePlayer";
 import { textSpanIntersectsWithPosition } from "typescript";
-import { Sprite } from "phaser-ce";
+import { Sprite, Image } from "phaser-ce";
 
 
 export class Level extends Phaser.State
@@ -17,6 +17,7 @@ export class Level extends Phaser.State
     private _player: Phaser.Sprite;
     private _enemyList: RemotePlayer[] = [];
     private treasure: Phaser.Sprite;
+    //private backg: Image;
     //private playerCollisionGroup: Phaser.Physics.P2.CollisionGroup;
    
    
@@ -31,15 +32,17 @@ export class Level extends Phaser.State
         this.load.image("background", "./images/background1.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
         this.load.image("girlright", "./images/girlright.png");
-        this.load.image("treasure", "./images/treasure.png" )
-       
-    
+        this.load.image("treasure", "./images/treasure.png" );
+          
     }
     
     public create()
     {
         this._socket = io.connect();
-        this.add.image(0,0,"background")
+        var backg = this.add.image(0,0,"background");
+        
+
+        
         this.treasure = this.add.sprite(510, 410, 'treasure');
         this.treasure.alpha = 0;
         this.physics.startSystem(Phaser.Physics.ARCADE);

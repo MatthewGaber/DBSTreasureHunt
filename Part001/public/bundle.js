@@ -46,6 +46,7 @@ exports.GameProperties = GameProperties;
 },{}],3:[function(require,module,exports){
 "use strict";
 /// <reference path="./libs/phaser.d.ts" />
+// https://dbs1000.herokuapp.com
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -68,6 +69,7 @@ var Level = /** @class */ (function (_super) {
         _this._enemyList = [];
         return _this;
     }
+    //private backg: Image;
     //private playerCollisionGroup: Phaser.Physics.P2.CollisionGroup;
     Level.prototype.preload = function () {
         this.stage.disableVisibilityChange = true;
@@ -81,7 +83,7 @@ var Level = /** @class */ (function (_super) {
     Level.prototype.create = function () {
         var _this = this;
         this._socket = io.connect();
-        this.add.image(0, 0, "background");
+        var backg = this.add.image(0, 0, "background");
         this.treasure = this.add.sprite(510, 410, 'treasure');
         this.treasure.alpha = 0;
         this.physics.startSystem(Phaser.Physics.ARCADE);
