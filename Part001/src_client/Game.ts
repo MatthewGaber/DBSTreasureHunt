@@ -8,8 +8,10 @@ export class Game extends Phaser.Game
     public constructor()
     {
         super(
-            window.innerWidth * window.devicePixelRatio,
-            window.innerHeight * window.devicePixelRatio,
+            1500,
+            1041,
+            //window.innerWidth * window.devicePixelRatio,
+            //window.innerHeight * window.devicePixelRatio,,
             Phaser.CANVAS,
             "gameDiv"
         );

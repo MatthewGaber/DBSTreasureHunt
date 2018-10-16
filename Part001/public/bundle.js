@@ -16,7 +16,10 @@ var Level_1 = require("./Level");
 var Game = /** @class */ (function (_super) {
     __extends(Game, _super);
     function Game() {
-        var _this = _super.call(this, window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, "gameDiv") || this;
+        var _this = _super.call(this, 1500, 1041, 
+        //window.innerWidth * window.devicePixelRatio,
+        //window.innerHeight * window.devicePixelRatio,,
+        Phaser.CANVAS, "gameDiv") || this;
         var btn = document.getElementById("startlevelbutton");
         btn.addEventListener("click", function (e) { return _this.startlevel(); });
         return _this;
@@ -73,9 +76,15 @@ var Level = /** @class */ (function (_super) {
     //private playerCollisionGroup: Phaser.Physics.P2.CollisionGroup;
     Level.prototype.preload = function () {
         this.stage.disableVisibilityChange = true;
-        this.scale.scaleMode = Phaser.ScaleManager.RESIZE;
-        this.world.setBounds(0, 0, GameProperties_1.GameProperties.GameWidth, GameProperties_1.GameProperties.GameHeight);
-        this.load.image("background", "./images/background1.jpg");
+        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.game.scale.windowConstraints.bottom = 'visual';
+        this.scale.pageAlignHorizontally = true;
+        this.scale.pageAlignVertically = true;
+        this.input.maxPointers = 1;
+        //this.world.setBounds(
+        //    0, 0,
+        //    GameProperties.GameWidth, GameProperties.GameHeight);
+        this.load.image("background", "./images/dbsbg.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
         this.load.image("girlright", "./images/girlright.png");
         this.load.image("treasure", "./images/treasure.png");
@@ -83,8 +92,10 @@ var Level = /** @class */ (function (_super) {
     Level.prototype.create = function () {
         var _this = this;
         this._socket = io.connect();
-        var backg = this.add.image(0, 0, "background");
-        this.treasure = this.add.sprite(510, 410, 'treasure');
+        var bgimg = this.add.image(0, 0, "background");
+        //bgimg.width = window.innerWidth * window.devicePixelRatio;
+        //bgimg.height = window.innerHeight * window.devicePixelRatio;
+        this.treasure = this.add.sprite(675, 680, 'treasure');
         this.treasure.alpha = 0;
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.physics.enable(this.treasure, Phaser.Physics.ARCADE);
