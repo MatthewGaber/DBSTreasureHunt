@@ -9,7 +9,7 @@ export class Game extends Phaser.Game
     {
         super(
             1500,
-            1041,
+            1142,
             //window.innerWidth * window.devicePixelRatio,
             //window.innerHeight * window.devicePixelRatio,,
             Phaser.CANVAS,

@@ -16,7 +16,7 @@ var Level_1 = require("./Level");
 var Game = /** @class */ (function (_super) {
     __extends(Game, _super);
     function Game() {
-        var _this = _super.call(this, 1500, 1041, 
+        var _this = _super.call(this, 1500, 1142, 
         //window.innerWidth * window.devicePixelRatio,
         //window.innerHeight * window.devicePixelRatio,,
         Phaser.CANVAS, "gameDiv") || this;
@@ -39,7 +39,7 @@ var GameProperties = /** @class */ (function () {
     function GameProperties() {
     }
     GameProperties.GameWidth = 1500;
-    GameProperties.GameHeight = 1041;
+    GameProperties.GameHeight = 1142;
     GameProperties.GameElement = "gameDiv";
     GameProperties.InGame = false;
     return GameProperties;
@@ -81,9 +81,7 @@ var Level = /** @class */ (function (_super) {
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
         this.input.maxPointers = 1;
-        //this.world.setBounds(
-        //    0, 0,
-        //    GameProperties.GameWidth, GameProperties.GameHeight);
+        this.world.setBounds(0, 0, GameProperties_1.GameProperties.GameWidth, GameProperties_1.GameProperties.GameHeight);
         this.load.image("background", "./images/dbsbg.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
         this.load.image("girlright", "./images/girlright.png");
@@ -95,7 +93,7 @@ var Level = /** @class */ (function (_super) {
         var bgimg = this.add.image(0, 0, "background");
         //bgimg.width = window.innerWidth * window.devicePixelRatio;
         //bgimg.height = window.innerHeight * window.devicePixelRatio;
-        this.treasure = this.add.sprite(675, 680, 'treasure');
+        this.treasure = this.add.sprite(635, 745, 'treasure');
         this.treasure.alpha = 0;
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.physics.enable(this.treasure, Phaser.Physics.ARCADE);

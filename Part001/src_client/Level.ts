@@ -30,13 +30,10 @@ export class Level extends Phaser.State
         this.game.scale.windowConstraints.bottom = 'visual';
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
-        this.input.maxPointers = 1;
-
-       
-        
-        //this.world.setBounds(
-        //    0, 0,
-        //    GameProperties.GameWidth, GameProperties.GameHeight);
+        this.input.maxPointers = 1;        
+        this.world.setBounds(
+            0, 0,
+            GameProperties.GameWidth, GameProperties.GameHeight);
         this.load.image("background", "./images/dbsbg.jpg");
         this.load.image("ninjaleft", "./images/ninjaleft.png");
         this.load.image("girlright", "./images/girlright.png");
@@ -52,10 +49,8 @@ export class Level extends Phaser.State
         
         //bgimg.width = window.innerWidth * window.devicePixelRatio;
         //bgimg.height = window.innerHeight * window.devicePixelRatio;
-        
-
-        
-        this.treasure = this.add.sprite(675, 680, 'treasure');
+       
+        this.treasure = this.add.sprite(635, 745, 'treasure');
         this.treasure.alpha = 0;
         this.physics.startSystem(Phaser.Physics.ARCADE);
         this.physics.enable(this.treasure, Phaser.Physics.ARCADE);
